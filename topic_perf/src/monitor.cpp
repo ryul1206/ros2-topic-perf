@@ -118,11 +118,11 @@ public:
           float hz = (float)count_sum_ / time_window_f;
           float bw = (float)byte_size_sum_ / time_window_f;
           if (nth_received_ >= time_window_i)
-            RCLCPP_INFO(this->get_logger(), "(window: %d [s]) hz: %.1f, bw: %.1f [Byte/s]", time_window_i, hz, bw);
+            RCLCPP_INFO(this->get_logger(), "(window: %d [s]) hz: %.3f, bw: %.2f [Byte/s]", time_window_i, hz, bw);
           else
           {
             nth_received_ += 1;
-            RCLCPP_WARN(this->get_logger(), "(window: %d [s]) hz: %.1f, bw: %.1f [Byte/s] <- [Invalid] Data too small for the window.", time_window_i, hz, bw);
+            RCLCPP_WARN(this->get_logger(), "(window: %d [s]) hz: %.3f, bw: %.2f [Byte/s] <- [Invalid] Data too small for the window.", time_window_i, hz, bw);
           }
 
           count_sum_ -= count_[tail_];

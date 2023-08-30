@@ -1,27 +1,63 @@
 # ros2-topic-perf
 
-Alternative tool to measure performance metrics of ROS 2 topics (hz, bandwidth)
+- Alternative tool to measure performance metrics of ROS 2 topics: `Hz` and `Bandwidth`
+- If you want to measure `Delay`, please refer to [`ros2 topic delay $TOPIC_NAME`](https://github.com/ros2/ros2cli/blob/humble/ros2topic/ros2topic/verb/delay.py) after installing `chrony`. (`sudo apt install chrony`, See [this article](https://wiki.nps.edu/display/RC/Time+Synchronisation+with+NTP) for more information.)
 
-## TODO
+## 🧰 Using Docker
 
-- Delay measurement. We need to resolve the time synchronization issue between the publisher and subscriber. Please refer to [this article](https://wiki.nps.edu/display/RC/Time+Synchronisation+with+NTP) for more information.
-- Dockerize
-
-## Using Docker
+### Build
 
 Build the docker image:
 
 ```bash
-
+docker build -t ros2-topic-perf:latest ./docker
 ```
+
+### Run
 
 Run the docker container:
 
 ```bash
-
+docker run --rm -it --network host --ipc host \
+    -v /etc/timezone:/etc/timezone:ro \
+    -v /etc/localtime:/etc/localtime:ro \
+    ros2-topic-perf:latest \
+    bash -c "ros2 run topic_perf monitor $TOPIC_NAME --ros-args -p time_window:=$TIME_WINDOW_SEC -p qos:=$QOS_PROFILE"
 ```
 
-## Build from Source
+or simply run the script:
+
+```bash
+cd $PKG_PATH/docker
+./run.sh $TOPIC_NAME $TIME_WINDOW_SEC $QOS_PROFILE
+```
+
+### Example Output
+
+```bash
+$ cd $PKG_PATH/docker
+$ ./run.sh /rgb/image_raw 3 0
+[INFO] [1693156941.645706671] [monitor]: time_window: 3
+[INFO] [1693156941.645748836] [monitor]: qos_profile: 0 (default)
+[INFO] [1693156941.645754400] [monitor]: topic_name: /rgb/image_raw
+[INFO] [1693156941.645758031] [monitor]: Waiting 10 sec for topic...
+[INFO] [1693156942.145897231] [monitor]: .
+[INFO] [1693156942.146206065] [monitor]: topic_type: sensor_msgs/msg/Image
+[WARN] [1693156943.147969671] [monitor]: (window: 3 [s]) hz: 1.7, bw: 20971620.0 [Byte/s] <- [Invalid] Data too small for the window.
+[WARN] [1693156944.147968502] [monitor]: (window: 3 [s]) hz: 3.3, bw: 41943240.0 [Byte/s] <- [Invalid] Data too small for the window.
+[WARN] [1693156945.147990045] [monitor]: (window: 3 [s]) hz: 5.0, bw: 62914860.0 [Byte/s] <- [Invalid] Data too small for the window.
+[INFO] [1693156946.147976779] [monitor]: (window: 3 [s]) hz: 5.0, bw: 62914860.0 [Byte/s]
+[INFO] [1693156947.147972053] [monitor]: (window: 3 [s]) hz: 5.0, bw: 62914860.0 [Byte/s]
+[INFO] [1693156948.147931569] [monitor]: (window: 3 [s]) hz: 5.0, bw: 62914860.0 [Byte/s]
+[INFO] [1693156949.148013788] [monitor]: (window: 3 [s]) hz: 5.0, bw: 62914860.0 [Byte/s]
+[INFO] [1693156950.148106233] [monitor]: (window: 3 [s]) hz: 5.0, bw: 62914860.0 [Byte/s]
+[INFO] [1693156951.148028207] [monitor]: (window: 3 [s]) hz: 5.0, bw: 62914860.0 [Byte/s]
+[INFO] [1693156952.147999271] [monitor]: (window: 3 [s]) hz: 5.0, bw: 62914860.0 [Byte/s]
+```
+
+## 🧰 Using from Source
+
+### Build
 
 ```bash
 cd $WORKSPACE/src
@@ -30,6 +66,8 @@ cd ..
 colcon build --symlink-install
 source install/setup.bash
 ```
+
+### Run
 
 After building the package, you can run the tool as follows:
 
